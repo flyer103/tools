@@ -17,12 +17,14 @@ import logging.handlers
 class Logger(object):
     """logger 生成器"""
     @staticmethod
-    def get_logger(service='', level=logging.DEBUG):
+    def get_logger(service='', level=logging.DEBUG,
+                   level_stream=logging.DEBUG, level_trfile=logging.INFO):
         """需要确保 service 唯一"""
         logger = logging.getLogger(service)
         logger.setLevel(level)
 
-        handlers = Logger.get_handlers()
+        handlers = Logger.get_handlers(level_stream=level_stream,
+                                       level_trfile=level_trfile)
         for handler in handlers:
             logger.addHandler(handler)
 
@@ -38,7 +40,8 @@ class Logger(object):
         return formatter
 
     @staticmethod
-    def get_handlers(fname='logger.log', **kwargs):
+    def get_handlers(fname='logger.log', level_stream=None,
+                     level_trfile=None, **kwargs):
         """提供两类 handler，一类在终端打印，一类写入到文件中.
 
         参数:
@@ -52,8 +55,8 @@ class Logger(object):
           + 参数检验
         """
         fname = fname or 'logger.log'
-        level_stream = kwargs.get('level_stream', logging.DEBUG)
-        level_trfile = kwargs.get('level_trfile', logging.WARNING)
+        level_stream = level_stream if level_stream else logging.DEBUG
+        level_trfile = level_trfile if level_trfile else logging.INFO
         when_trfile = kwargs.get('when_trfile', 'W0')
         encoding = kwargs.get('encoding', 'utf-8')
         
